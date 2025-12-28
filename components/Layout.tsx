@@ -1,7 +1,7 @@
 // Main layout component with navigation
-'use client';
+"use client";
 
-import { Navbar } from './Navbar';
+import { Navbar } from "./Navbar";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -21,7 +21,7 @@ export function Layout({ children }: LayoutProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-sm md:text-base text-gray-600">
-              © 2024 Red Rose Symptom Checker. All rights reserved.
+              © 2025 Red Rose Symptom Checker. All rights reserved.
             </p>
             <p className="mt-2 text-xs text-gray-500">
               AI-powered symptom diagnosis and health tracking
@@ -32,4 +32,3 @@ export function Layout({ children }: LayoutProps) {
     </div>
   );
 }
-
