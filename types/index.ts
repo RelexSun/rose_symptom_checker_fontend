@@ -65,6 +65,9 @@ export interface DiagnosisResponse {
 export interface DiagnosisHistoryResponse {
   total: number;
   items: DiagnosisResponse[];
+  page?: number;
+  limit?: number;
+  total_pages?: number;
 }
 
 export interface ApiError {

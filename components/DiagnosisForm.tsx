@@ -1,11 +1,12 @@
 // Diagnosis form component for submitting symptoms
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { diagnosisApi } from '@/lib/api';
-import { ErrorMessage } from '@/components/ErrorMessage';
-import type { SymptomInput, DiagnosisResult } from '@/types';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { diagnosisApi } from "@/lib/api";
+import { ErrorMessage } from "@/components/ErrorMessage";
+import { revalidateDiagnosisHistory } from "@/app/actions/revalidate";
+import type { SymptomInput, DiagnosisResult } from "@/types";
 
 export function DiagnosisForm() {
   const router = useRouter();
@@ -23,9 +24,12 @@ export function DiagnosisForm() {
         const symptoms = await diagnosisApi.getSymptoms();
         setAvailableSymptoms(symptoms);
       } catch (err: any) {
-        setError(err || {
-          message: 'Unable to load available symptoms. Please refresh the page and try again.',
-        });
+        setError(
+          err || {
+            message:
+              "Unable to load available symptoms. Please refresh the page and try again.",
+          }
+        );
       } finally {
         setLoadingSymptoms(false);
       }
@@ -44,11 +48,11 @@ export function DiagnosisForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (selectedSymptoms.length === 0) {
       setError({
-        message: 'Please select at least one symptom to get a diagnosis.',
+        message: "Please select at least one symptom to get a diagnosis.",
       });
       return;
     }
@@ -62,15 +66,18 @@ export function DiagnosisForm() {
     try {
       const result: DiagnosisResult = await diagnosisApi.check(request);
       // Store result in sessionStorage to pass to result page
-      sessionStorage.setItem('diagnosis_result', JSON.stringify(result));
+      sessionStorage.setItem("diagnosis_result", JSON.stringify(result));
       // Revalidate diagnosis history page to show new diagnosis
-      router.refresh();
+      await revalidateDiagnosisHistory();
       // Route to result page
-      router.push('/diagnosis/result');
+      router.push("/diagnosis/result");
     } catch (err: any) {
-      setError(err || {
-        message: 'Unable to process your symptoms. Please check your connection and try again.',
-      });
+      setError(
+        err || {
+          message:
+            "Unable to process your symptoms. Please check your connection and try again.",
+        }
+      );
       setLoading(false);
     }
   };
@@ -78,9 +85,9 @@ export function DiagnosisForm() {
   // Format symptom name for display (replace underscores with spaces and capitalize)
   const formatSymptomName = (symptom: string): string => {
     return symptom
-      .split('_')
+      .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+      .join(" ");
   };
 
   return (
@@ -115,7 +122,9 @@ export function DiagnosisForm() {
           {loadingSymptoms ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mb-4"></div>
-              <p className="text-gray-500 text-lg">Loading available symptoms...</p>
+              <p className="text-gray-500 text-lg">
+                Loading available symptoms...
+              </p>
             </div>
           ) : (
             <div className="border-2 border-gray-200 rounded-xl p-6 max-h-96 overflow-y-auto bg-gray-50 hover:border-blue-300 transition-all">
@@ -125,8 +134,8 @@ export function DiagnosisForm() {
                     key={symptom}
                     className={`flex items-center space-x-3 p-4 rounded-lg cursor-pointer border-2 transition-all hover-lift ${
                       selectedSymptoms.includes(symptom)
-                        ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-blue-400 shadow-md'
-                        : 'bg-white border-gray-200 hover:border-blue-300'
+                        ? "bg-gradient-to-r from-blue-50 to-purple-50 border-blue-400 shadow-md"
+                        : "bg-white border-gray-200 hover:border-blue-300"
                     }`}
                     style={{
                       animationDelay: `${index * 0.02}s`,
@@ -141,8 +150,8 @@ export function DiagnosisForm() {
                     <span
                       className={`text-sm flex-1 font-medium ${
                         selectedSymptoms.includes(symptom)
-                          ? 'text-blue-900'
-                          : 'text-gray-700'
+                          ? "text-blue-900"
+                          : "text-gray-700"
                       }`}
                     >
                       {formatSymptomName(symptom)}
@@ -251,4 +260,3 @@ export function DiagnosisForm() {
     </div>
   );
 }
-

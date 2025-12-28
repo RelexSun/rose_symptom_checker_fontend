@@ -3,6 +3,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { PublicNavbar } from './PublicNavbar';
 
 export function LandingPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -20,6 +21,9 @@ export function LandingPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
+      {/* Public Navbar */}
+      <PublicNavbar />
+      
       {/* Animated Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-rose-50 via-red-50 to-pink-50">
         <div
@@ -50,7 +54,7 @@ export function LandingPage() {
       {/* Content */}
       <div className="relative z-10">
         {/* Hero Section */}
-        <section className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20">
+        <section className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-24 md:pt-28">
           <div className="max-w-7xl mx-auto text-center">
             {/* Main Rose Icon */}
             <div className="mb-8 animate-bounce-in">

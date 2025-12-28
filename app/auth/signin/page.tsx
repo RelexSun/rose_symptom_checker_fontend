@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useUserStore } from '@/stores/userStore';
 import { ErrorMessage } from '@/components/ErrorMessage';
+import { PublicNavbar } from '@/components/PublicNavbar';
 import type { LoginCredentials } from '@/types';
 
 export default function SignInPage() {
@@ -62,9 +63,11 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 animate-fade-in">
-        <div className="text-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <PublicNavbar />
+      <div className="flex items-center justify-center pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8 animate-fade-in">
+          <div className="text-center">
           <div className="inline-block mb-4">
             <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
               <svg
@@ -98,8 +101,8 @@ export default function SignInPage() {
               Create one now
             </Link>
           </p>
-        </div>
-        <div className="bg-white rounded-2xl shadow-xl p-8 animate-slide-up">
+          </div>
+          <div className="bg-white rounded-2xl shadow-xl p-8 animate-slide-up">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {success && (
               <div className="bg-green-50 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-lg flex items-center animate-slide-down">
@@ -189,6 +192,7 @@ export default function SignInPage() {
               </button>
             </div>
           </form>
+          </div>
         </div>
       </div>
     </div>

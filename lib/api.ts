@@ -200,11 +200,18 @@ export const diagnosisApi = {
 
   /**
    * Get diagnosis history
+   * @param skip - Number of items to skip (0-indexed)
+   * @param limit - Number of items per page
    */
-  getHistory: async (): Promise<DiagnosisHistoryResponse> => {
-    const response = await apiClient.get<BaseResponse<DiagnosisHistoryResponse>>(
-      '/api/v1/diagnosis/history'
-    );
+  getHistory: async (skip?: number, limit?: number): Promise<DiagnosisHistoryResponse> => {
+    const params = new URLSearchParams();
+    if (skip !== undefined) params.append('skip', skip.toString());
+    if (limit !== undefined) params.append('limit', limit.toString());
+    
+    const queryString = params.toString();
+    const url = `/api/v1/diagnosis/history${queryString ? `?${queryString}` : ''}`;
+    
+    const response = await apiClient.get<BaseResponse<DiagnosisHistoryResponse>>(url);
     return response.data as DiagnosisHistoryResponse;
   },
 

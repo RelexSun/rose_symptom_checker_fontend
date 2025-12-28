@@ -80,12 +80,20 @@ export function createServerApiClient(token?: string): AxiosInstance {
 export const diagnosisApiServer = {
   /**
    * Get diagnosis history (server-side)
+   * @param token - Auth token
+   * @param skip - Number of items to skip (0-indexed)
+   * @param limit - Number of items per page
    */
-  getHistory: async (token?: string): Promise<DiagnosisHistoryResponse> => {
+  getHistory: async (token?: string, skip?: number, limit?: number): Promise<DiagnosisHistoryResponse> => {
     const client = createServerApiClient(token);
-    const response = await client.get<DiagnosisHistoryResponse>(
-      "/api/v1/diagnosis/history"
-    );
+    const params = new URLSearchParams();
+    if (skip !== undefined) params.append('skip', skip.toString());
+    if (limit !== undefined) params.append('limit', limit.toString());
+    
+    const queryString = params.toString();
+    const url = `/api/v1/diagnosis/history${queryString ? `?${queryString}` : ''}`;
+    
+    const response = await client.get<DiagnosisHistoryResponse>(url);
     // Interceptor already unwraps BaseResponse, so data is already DiagnosisHistoryResponse
     return response.data;
   },
