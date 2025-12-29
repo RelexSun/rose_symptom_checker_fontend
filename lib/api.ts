@@ -149,7 +149,8 @@ export const authApi = {
       '/api/v1/auth/register',
       credentials
     );
-    const data = response.data as { user: User; token: Token };
+    // Interceptor unwraps BaseResponse, so data is already { user: User; token: Token }
+    const data = response.data as unknown as { user: User; token: Token };
     // Store the access token
     if (data.token?.access_token) {
       setAuthToken(data.token.access_token);
@@ -166,7 +167,8 @@ export const authApi = {
       '/api/v1/auth/login',
       credentials
     );
-    const token = response.data as Token;
+    // Interceptor unwraps BaseResponse, so data is already Token
+    const token = response.data as unknown as Token;
     // Store the access token
     if (token?.access_token) {
       setAuthToken(token.access_token);
@@ -184,7 +186,8 @@ export const diagnosisApi = {
     const response = await apiClient.get<BaseResponse<string[]>>(
       '/api/v1/diagnosis/symptoms'
     );
-    return response.data as string[];
+    // Interceptor unwraps BaseResponse, so data is already string[]
+    return response.data as unknown as string[];
   },
 
   /**
@@ -195,7 +198,8 @@ export const diagnosisApi = {
       '/api/v1/diagnosis/check',
       request
     );
-    return response.data as DiagnosisResult;
+    // Interceptor unwraps BaseResponse, so data is already DiagnosisResult
+    return response.data as unknown as DiagnosisResult;
   },
 
   /**
@@ -212,7 +216,8 @@ export const diagnosisApi = {
     const url = `/api/v1/diagnosis/history${queryString ? `?${queryString}` : ''}`;
     
     const response = await apiClient.get<BaseResponse<DiagnosisHistoryResponse>>(url);
-    return response.data as DiagnosisHistoryResponse;
+    // Interceptor unwraps BaseResponse, so data is already DiagnosisHistoryResponse
+    return response.data as unknown as DiagnosisHistoryResponse;
   },
 
   /**
@@ -222,7 +227,8 @@ export const diagnosisApi = {
     const response = await apiClient.get<BaseResponse<DiagnosisResponse>>(
       `/api/v1/diagnosis/history/${id}`
     );
-    return response.data as DiagnosisResponse;
+    // Interceptor unwraps BaseResponse, so data is already DiagnosisResponse
+    return response.data as unknown as DiagnosisResponse;
   },
 };
 
