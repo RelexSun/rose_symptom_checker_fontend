@@ -72,12 +72,18 @@ export function DiagnosisForm() {
       // Route to result page
       router.push("/diagnosis/result");
     } catch (err: any) {
-      setError(
-        err || {
-          message:
-            "Unable to process your symptoms. Please check your connection and try again.",
-        }
-      );
+      // Log error for debugging (only in development)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Diagnosis check error:', err);
+      }
+      
+      // Use error message from API if available, otherwise use default
+      const errorMessage = err?.message || 
+        "Unable to process your symptoms. Please check your connection and try again.";
+      
+      setError({
+        message: errorMessage,
+      });
       setLoading(false);
     }
   };

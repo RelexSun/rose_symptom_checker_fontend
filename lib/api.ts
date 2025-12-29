@@ -17,12 +17,18 @@ import type {
 // Get API base URL from environment variable
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
+// Log API URL in development to help with debugging
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+  console.log('API Base URL:', API_BASE_URL);
+}
+
 // Create axios instance with default config
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 30000, // 30 seconds timeout
 });
 
 // Request interceptor to add auth token
@@ -40,6 +46,10 @@ apiClient.interceptors.request.use(
           const session = await getSession();
           if (session && (session as any).token) {
             token = (session as any).token;
+            // Also store in localStorage for consistency
+            if (token) {
+              localStorage.setItem('auth_token', token);
+            }
           }
         } catch (e) {
           // Session not available, continue with localStorage token
@@ -48,8 +58,13 @@ apiClient.interceptors.request.use(
       
       if (token) {
         // Token might be stored as access_token or full token object
-        const accessToken = token.startsWith('{') ? JSON.parse(token).access_token : token;
-        config.headers.Authorization = `Bearer ${accessToken}`;
+        try {
+          const accessToken = token.startsWith('{') ? JSON.parse(token).access_token : token;
+          config.headers.Authorization = `Bearer ${accessToken}`;
+        } catch (e) {
+          // If parsing fails, use token as-is
+          config.headers.Authorization = `Bearer ${token}`;
+        }
       }
     }
     return config;
@@ -100,8 +115,31 @@ apiClient.interceptors.response.use(
       return Promise.reject(apiError);
     } else if (error.request) {
       // Request was made but no response received
+      // This could be CORS, network timeout, or server not reachable
+      const apiUrl = API_BASE_URL;
+      const isNetworkError = !error.request.response;
+      
+      // Provide more helpful error message
+      let errorMessage = 'Unable to connect to the server. ';
+      if (apiUrl.includes('localhost') || apiUrl.includes('127.0.0.1')) {
+        errorMessage += 'Please ensure your backend server is running and accessible.';
+      } else {
+        errorMessage += 'This could be due to a network issue, CORS configuration, or the server being temporarily unavailable. Please check your internet connection and try again.';
+      }
+      
+      // Log error details in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('API Request Error:', {
+          url: error.config?.url,
+          baseURL: error.config?.baseURL,
+          method: error.config?.method,
+          hasAuth: !!error.config?.headers?.Authorization,
+          error: error.message,
+        });
+      }
+      
       return Promise.reject({
-        message: 'Unable to connect to the server. Please check your internet connection and try again.',
+        message: errorMessage,
       } as ApiError);
     } else {
       // Something else happened
