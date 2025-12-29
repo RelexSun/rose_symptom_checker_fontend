@@ -28,7 +28,7 @@ export function DiagnosisHistory({ diagnoses }: DiagnosisHistoryProps) {
           </svg>
         </div>
         <p className="text-gray-700 text-lg font-medium mb-2">
-          You don't have any diagnosis history yet
+          You don&apos;t have any diagnosis history yet
         </p>
         <p className="text-gray-500 mb-6">
           Start by checking your symptoms to get your first diagnosis

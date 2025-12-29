@@ -1,7 +1,7 @@
 // Sign in page - client component for form handling
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -10,7 +10,7 @@ import { ErrorMessage } from '@/components/ErrorMessage';
 import { PublicNavbar } from '@/components/PublicNavbar';
 import type { LoginCredentials } from '@/types';
 
-export default function SignInPage() {
+function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const setUser = useUserStore((state) => state.setUser);
@@ -93,7 +93,7 @@ export default function SignInPage() {
             <span className="font-semibold text-blue-600">Red Rose Symptom Checker</span>
           </p>
           <p className="mt-4 text-sm text-gray-600">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link
               href="/auth/signup"
               className="font-medium text-blue-600 hover:text-blue-700 transition-colors"
@@ -196,6 +196,20 @@ export default function SignInPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+        </div>
+      }
+    >
+      <SignInContent />
+    </Suspense>
   );
 }
 

@@ -9,7 +9,7 @@ export default function NotFound() {
           Diagnosis Not Found
         </h1>
         <p className="text-gray-600 mb-6">
-          The diagnosis you're looking for doesn't exist or has been removed.
+          The diagnosis you&apos;re looking for doesn&apos;t exist or has been removed.
         </p>
         <Link
           href="/diagnosis/history"

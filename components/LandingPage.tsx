@@ -38,12 +38,13 @@ export function LandingPage() {
       }
     );
 
-    testimonialRefs.current.forEach((ref) => {
+    const currentRefs = testimonialRefs.current;
+    currentRefs.forEach((ref) => {
       if (ref) observer.observe(ref);
     });
 
     return () => {
-      testimonialRefs.current.forEach((ref) => {
+      currentRefs.forEach((ref) => {
         if (ref) observer.unobserve(ref);
       });
     };
@@ -146,7 +147,9 @@ export function LandingPage() {
               style={{ animationDelay: "0.1s" }}
             >
               Where{" "}
-              <span className="font-bold text-rose-600">Nature's Beauty</span>{" "}
+              <span className="font-bold text-rose-600">
+                Nature&apos;s Beauty
+              </span>{" "}
               Meets
             </p>
             <p

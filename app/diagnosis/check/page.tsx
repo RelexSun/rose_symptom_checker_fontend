@@ -51,7 +51,7 @@ export default function DiagnosisCheckPage() {
                 Symptom Checker
               </h1>
               <p className="text-gray-600 mt-1">
-                Select the symptoms you're experiencing to get a diagnosis
+                Select the symptoms you&apos;re experiencing to get a diagnosis
               </p>
             </div>
           </div>

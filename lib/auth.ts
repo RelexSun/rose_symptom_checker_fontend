@@ -12,24 +12,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials): Promise<import('next-auth').User | null> {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
 
+        const email = String(credentials.email);
+        const password = String(credentials.password);
+
         try {
           const token = await authApi.login({
-            email: credentials.email as string,
-            password: credentials.password as string,
+            email,
+            password,
           });
 
           if (token?.access_token) {
             // Return user info with token - we'll use email as identifier
             // The actual user data might need to be fetched separately
             return {
-              id: credentials.email, // Temporary - will be replaced with actual user ID
-              email: credentials.email as string,
-              name: credentials.email as string,
+              id: email, // Use email as identifier
+              email: email,
+              name: email,
               token: token.access_token,
             };
           }

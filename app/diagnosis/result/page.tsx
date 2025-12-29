@@ -1,12 +1,12 @@
 // Diagnosis result page - displays immediate diagnosis result
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import type { DiagnosisResult } from '@/types';
 
-export default function DiagnosisResultPage() {
+function DiagnosisResultContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [result, setResult] = useState<DiagnosisResult | null>(null);
@@ -255,6 +255,20 @@ export default function DiagnosisResultPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DiagnosisResultPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+        </div>
+      }
+    >
+      <DiagnosisResultContent />
+    </Suspense>
   );
 }
 
