@@ -6,10 +6,13 @@ import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { LogoutButton } from './LogoutButton';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { useI18n } from '@/lib/i18n/context';
 
 export function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -33,9 +36,9 @@ export function Navbar() {
   }
 
   const navLinks = [
-    { href: '/', label: 'Home', icon: '🏠' },
-    { href: '/diagnosis/check', label: 'Check Symptoms', icon: '🔍' },
-    { href: '/diagnosis/history', label: 'History', icon: '📋' },
+    { href: '/', label: t.nav.home, icon: '🏠' },
+    { href: '/diagnosis/check', label: t.nav.checkSymptoms, icon: '🔍' },
+    { href: '/diagnosis/history', label: t.nav.history, icon: '📋' },
   ];
 
   const isActive = (href: string) => {
@@ -103,6 +106,7 @@ export function Navbar() {
 
           {/* User Info & Actions - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
+            <LanguageSwitcher />
             {session.user?.email && (
               <div className="flex items-center space-x-2 px-4 py-2 bg-gray-50 rounded-lg">
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
@@ -197,6 +201,11 @@ export function Navbar() {
                 </div>
               </div>
             )}
+
+            {/* Mobile Language Switcher */}
+            <div className="px-4 py-2 border-t border-gray-200">
+              <LanguageSwitcher />
+            </div>
 
             {/* Mobile Logout */}
             <div className="px-4 py-2 border-t border-gray-200">

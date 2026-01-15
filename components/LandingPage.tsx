@@ -4,8 +4,10 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { PublicNavbar } from "./PublicNavbar";
+import { useI18n } from "@/lib/i18n/context";
 
 export function LandingPage() {
+  const { t } = useI18n();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [showScrollMenu, setShowScrollMenu] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -146,18 +148,14 @@ export function LandingPage() {
               className="text-xl md:text-2xl lg:text-3xl text-gray-700 mb-4 font-light animate-slide-up"
               style={{ animationDelay: "0.1s" }}
             >
-              Where{" "}
-              <span className="font-bold text-rose-600">
-                Nature&apos;s Beauty
-              </span>{" "}
-              Meets
+              {t.landing.subtitle1}
             </p>
             <p
               className="text-xl md:text-2xl lg:text-3xl text-gray-700 mb-12 font-light animate-slide-up"
               style={{ animationDelay: "0.2s" }}
             >
               <span className="font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Machine Learning Intelligence
+                {t.landing.subtitle2}
               </span>
             </p>
 
@@ -171,7 +169,7 @@ export function LandingPage() {
                 className="group relative px-8 py-4 bg-gradient-to-r from-rose-600 to-red-600 text-white font-bold text-lg rounded-full shadow-2xl hover:shadow-rose-500/50 transform hover:scale-105 transition-all duration-300 overflow-hidden"
               >
                 <span className="relative z-10 flex items-center space-x-2">
-                  <span>Get Started</span>
+                  <span>{t.landing.getStarted}</span>
                   <svg
                     className="w-5 h-5 transform group-hover:translate-x-1 transition-transform"
                     fill="none"
@@ -192,7 +190,7 @@ export function LandingPage() {
                 href="/auth/signin"
                 className="px-8 py-4 bg-white/80 backdrop-blur-sm text-rose-600 font-bold text-lg rounded-full border-2 border-rose-300 hover:border-rose-500 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
               >
-                Sign In
+                {t.landing.signIn}
               </Link>
             </div>
           </div>
@@ -203,12 +201,11 @@ export function LandingPage() {
           <div className="max-w-7xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
               <span className="bg-gradient-to-r from-rose-600 to-red-600 bg-clip-text text-transparent">
-                Powered by Advanced AI
+                {t.landing.poweredBy}
               </span>
             </h2>
             <p className="text-xl text-gray-600 text-center mb-16 max-w-2xl mx-auto">
-              Combining the elegance of red roses with cutting-edge machine
-              learning technology
+              {t.landing.combining}
             </p>
 
             <div className="grid md:grid-cols-3 gap-8">
@@ -230,11 +227,10 @@ export function LandingPage() {
                   </svg>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                  Neural Networks
+                  {t.landing.neuralNetworks}
                 </h3>
                 <p className="text-gray-600">
-                  Deep learning algorithms trained on thousands of symptom
-                  patterns to provide accurate diagnoses
+                  {t.landing.neuralNetworksDesc}
                 </p>
               </div>
 
@@ -256,11 +252,10 @@ export function LandingPage() {
                   </svg>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                  Instant Analysis
+                  {t.landing.instantAnalysis}
                 </h3>
                 <p className="text-gray-600">
-                  Real-time symptom processing with machine learning models that
-                  learn and improve continuously
+                  {t.landing.instantAnalysisDesc}
                 </p>
               </div>
 
@@ -282,11 +277,10 @@ export function LandingPage() {
                   </svg>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                  Data-Driven Insights
+                  {t.landing.dataDriven}
                 </h3>
                 <p className="text-gray-600">
-                  Advanced analytics powered by machine learning to track
-                  patterns and provide personalized recommendations
+                  {t.landing.dataDrivenDesc}
                 </p>
               </div>
             </div>
@@ -303,16 +297,13 @@ export function LandingPage() {
               <div>
                 <h2 className="text-4xl md:text-5xl font-bold mb-6">
                   <span className="bg-gradient-to-r from-rose-600 to-red-600 bg-clip-text text-transparent">
-                    Machine Learning
+                    {t.landing.mlAtFinest.split(' ').slice(0, 2).join(' ')}
                   </span>
                   <br />
-                  <span className="text-gray-800">at its Finest</span>
+                  <span className="text-gray-800">{t.landing.mlAtFinest.split(' ').slice(2).join(' ')}</span>
                 </h2>
                 <p className="text-lg text-gray-700 mb-6">
-                  Our AI system uses state-of-the-art machine learning
-                  algorithms to analyze symptoms with precision. Just like a red
-                  rose blooms with care, our models have been carefully trained
-                  and refined.
+                  {t.landing.mlDescription}
                 </p>
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
@@ -330,7 +321,7 @@ export function LandingPage() {
                       </svg>
                     </div>
                     <p className="text-gray-700">
-                      Deep neural networks for pattern recognition
+                      {t.landing.deepNeural}
                     </p>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -348,7 +339,7 @@ export function LandingPage() {
                       </svg>
                     </div>
                     <p className="text-gray-700">
-                      Natural language processing for symptom understanding
+                      {t.landing.nlp}
                     </p>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -366,7 +357,7 @@ export function LandingPage() {
                       </svg>
                     </div>
                     <p className="text-gray-700">
-                      Continuous learning from user feedback
+                      {t.landing.continuousLearning}
                     </p>
                   </div>
                 </div>
@@ -377,7 +368,7 @@ export function LandingPage() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between p-4 bg-gradient-to-r from-rose-50 to-red-50 rounded-xl">
                       <span className="text-rose-600 font-semibold">
-                        Model Accuracy
+                        {t.landing.modelAccuracy}
                       </span>
                       <span className="text-2xl font-bold text-rose-600">
                         98.5%
@@ -385,7 +376,7 @@ export function LandingPage() {
                     </div>
                     <div className="flex items-center justify-between p-4 bg-gradient-to-r from-rose-50 to-red-50 rounded-xl">
                       <span className="text-rose-600 font-semibold">
-                        Training Data
+                        {t.landing.trainingData}
                       </span>
                       <span className="text-2xl font-bold text-rose-600">
                         10K+ Cases
@@ -393,7 +384,7 @@ export function LandingPage() {
                     </div>
                     <div className="flex items-center justify-between p-4 bg-gradient-to-r from-rose-50 to-red-50 rounded-xl">
                       <span className="text-rose-600 font-semibold">
-                        Response Time
+                        {t.landing.responseTime}
                       </span>
                       <span className="text-2xl font-bold text-rose-600">
                         &lt;2s

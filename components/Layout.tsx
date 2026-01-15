@@ -2,12 +2,15 @@
 "use client";
 
 import { Navbar } from "./Navbar";
+import { useI18n } from "@/lib/i18n/context";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
+  const { t } = useI18n();
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Responsive Navigation */}
@@ -21,10 +24,10 @@ export function Layout({ children }: LayoutProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-sm md:text-base text-gray-600">
-              © 2026 Red Rose Symptom Checker. All rights reserved.
+              {t.footer.copyright}
             </p>
             <p className="mt-2 text-xs text-gray-500">
-              AI-powered symptom diagnosis and health tracking
+              {t.footer.tagline}
             </p>
           </div>
         </div>
