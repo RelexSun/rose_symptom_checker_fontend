@@ -36,9 +36,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
-    // Update HTML lang attribute
-    if (typeof document !== "undefined") {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+      // Update HTML lang attribute
       document.documentElement.lang = lang;
     }
   };
@@ -54,17 +54,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const currentLanguage: Language =
     language === "en" || language === "km" ? language : "en";
 
+  // Always provide context value, even before mounted (use default 'en' translations)
   const value: I18nContextType = {
     language: currentLanguage,
     setLanguage,
     t: translations[currentLanguage],
   };
 
-  // Prevent hydration mismatch by not rendering until mounted
-  if (!mounted) {
-    return <>{children}</>;
-  }
-
+  // Always render the provider to ensure context is available
+  // This prevents the "useI18n must be used within an I18nProvider" error
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
