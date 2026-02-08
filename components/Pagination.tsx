@@ -20,10 +20,12 @@ export function Pagination({
 }: PaginationProps) {
   const searchParams = useSearchParams();
   
-  // Build query string preserving other params
+  // Build query string preserving other params, using skip/limit
   const buildUrl = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set("page", page.toString());
+    const skip = (page - 1) * itemsPerPage;
+    params.set("skip", skip.toString());
+    params.set("limit", itemsPerPage.toString());
     return `${basePath}?${params.toString()}`;
   };
 

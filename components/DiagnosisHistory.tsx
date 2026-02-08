@@ -5,11 +5,11 @@ import Link from "next/link";
 import type { DiagnosisResponse } from "@/types";
 
 interface DiagnosisHistoryProps {
-  diagnoses: DiagnosisResponse[];
+  diagnoses?: DiagnosisResponse[];
 }
 
 export function DiagnosisHistory({ diagnoses }: DiagnosisHistoryProps) {
-  if (diagnoses.length === 0) {
+  if (!diagnoses || diagnoses.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-8 text-center">
         <div className="mb-4">
@@ -61,32 +61,34 @@ export function DiagnosisHistory({ diagnoses }: DiagnosisHistoryProps) {
       {diagnoses.map((diagnosis) => (
         <Link
           key={diagnosis.id}
-          href={`/diagnosis/history/${diagnosis.id}`}
+          href={`/diagnosis/history/${diagnosis.outcome_id}`}
           className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
         >
           <div className="flex justify-between items-start">
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {diagnosis.disease_predicted || "Diagnosis Result"}
+                {diagnosis.outcome_name || "Diagnosis Result"}
               </h3>
               <div className="text-sm text-gray-600 space-y-1">
                 <p>
-                  <span className="font-medium">Symptoms:</span>{" "}
-                  {diagnosis.symptoms
-                    .map((s) =>
-                      s
-                        .split("_")
-                        .map(
-                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
-                        )
-                        .join(" ")
-                    )
-                    .join(", ") || "N/A"}
+                  <span className="font-medium">Symptoms Reported:</span>{" "}
+                  {diagnosis.symptoms_reported &&
+                  diagnosis.symptoms_reported.length > 0
+                    ? `${diagnosis.symptoms_reported.length} symptom${
+                        diagnosis.symptoms_reported.length > 1 ? "s" : ""
+                      }`
+                    : "N/A"}
                 </p>
                 {diagnosis.confidence_score !== undefined && (
                   <p>
                     <span className="font-medium">Confidence:</span>{" "}
                     {(diagnosis.confidence_score * 100).toFixed(1)}%
+                  </p>
+                )}
+                {diagnosis.notes && (
+                  <p>
+                    <span className="font-medium">Notes:</span>{" "}
+                    {diagnosis.notes}
                   </p>
                 )}
                 <p>

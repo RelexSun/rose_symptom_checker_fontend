@@ -1,13 +1,15 @@
 // Responsive navbar component
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
-import { LogoutButton } from './LogoutButton';
-import { LanguageSwitcher } from './LanguageSwitcher';
-import { useI18n } from '@/lib/i18n/context';
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { LogoutButton } from "./LogoutButton";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+import { useI18n } from "@/lib/i18n/context";
+import { userApi } from "@/lib/api";
+import type { User } from "@/types";
 
 export function Navbar() {
   const { data: session } = useSession();
@@ -15,6 +17,8 @@ export function Navbar() {
   const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -26,24 +30,58 @@ export function Navbar() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Load current user to determine role (role_id 1 = admin, role_id 2 = user)
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadUser = async () => {
+      if (!session) {
+        setCurrentUser(null);
+        setIsAdmin(false);
+        return;
+      }
+
+      try {
+        const user = await userApi.me();
+        if (!cancelled) {
+          setCurrentUser(user);
+          setIsAdmin(user.role_id === 1);
+        }
+      } catch {
+        if (!cancelled) {
+          setCurrentUser(null);
+          setIsAdmin(false);
+        }
+      }
+    };
+
+    loadUser();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [session]);
+
   // Don't show navbar on auth pages
-  if (!session || pathname?.startsWith('/auth')) {
+  if (!session || pathname?.startsWith("/auth")) {
     return null;
   }
 
   const navLinks = [
-    { href: '/', label: t.nav.home, icon: '🏠' },
-    { href: '/diagnosis/check', label: t.nav.checkSymptoms, icon: '🔍' },
-    { href: '/diagnosis/history', label: t.nav.history, icon: '📋' },
+    { href: "/", label: t.nav.home, icon: "🏠" },
+    { href: "/diagnosis/check", label: t.nav.checkSymptoms, icon: "🔍" },
+    { href: "/diagnosis/history", label: t.nav.history, icon: "📋" },
+    // Single admin entry; within admin pages we show tabs for Users / Symptoms / Outcomes
+    ...(isAdmin ? [{ href: "/admin/users", label: "Admin", icon: "🛠️" }] : []),
   ];
 
   const isActive = (href: string) => {
-    if (href === '/') {
-      return pathname === '/';
+    if (href === "/") {
+      return pathname === "/";
     }
     return pathname?.startsWith(href);
   };
@@ -52,8 +90,8 @@ export function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-white/95 backdrop-blur-md shadow-lg'
-          : 'bg-white shadow-sm'
+          ? "bg-white/95 backdrop-blur-md shadow-lg"
+          : "bg-white shadow-sm"
       } border-b border-gray-200`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -92,8 +130,8 @@ export function Navbar() {
                 href={link.href}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActive(link.href)
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md'
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
+                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                 }`}
               >
                 <span className="flex items-center space-x-2">
@@ -164,7 +202,7 @@ export function Navbar() {
         {/* Mobile Menu */}
         <div
           className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+            isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
         >
           <div className="py-4 space-y-2 border-t border-gray-200">
@@ -175,15 +213,15 @@ export function Navbar() {
                 onClick={() => setIsOpen(false)}
                 className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-base font-medium transition-all ${
                   isActive(link.href)
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
+                    : "text-gray-700 hover:bg-gray-100"
                 }`}
               >
                 <span className="text-xl">{link.icon}</span>
                 <span>{link.label}</span>
               </Link>
             ))}
-            
+
             {/* Mobile User Info */}
             {session.user?.email && (
               <div className="px-4 py-3 border-t border-gray-200">
@@ -217,4 +255,3 @@ export function Navbar() {
     </nav>
   );
 }
-

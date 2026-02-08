@@ -3,15 +3,15 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { diagnosisApi } from "@/lib/api";
+import { diagnosisApi, symptomApi } from "@/lib/api";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { revalidateDiagnosisHistory } from "@/app/actions/revalidate";
-import type { SymptomInput, DiagnosisResult } from "@/types";
+import type { SymptomInput, DiagnosisResult, Symptom } from "@/types";
 
 export function DiagnosisForm() {
   const router = useRouter();
-  const [availableSymptoms, setAvailableSymptoms] = useState<string[]>([]);
-  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [availableSymptoms, setAvailableSymptoms] = useState<Symptom[]>([]);
+  const [selectedSymptomIds, setSelectedSymptomIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingSymptoms, setLoadingSymptoms] = useState(true);
   const [error, setError] = useState<any>(null);
@@ -21,7 +21,12 @@ export function DiagnosisForm() {
     const fetchSymptoms = async () => {
       try {
         setLoadingSymptoms(true);
-        const symptoms = await diagnosisApi.getSymptoms();
+        // Fetch all active symptoms for selection (no pagination in UI)
+        const symptoms = await symptomApi.list({
+          skip: 0,
+          limit: 1000,
+          is_active: true,
+        });
         setAvailableSymptoms(symptoms);
       } catch (err: any) {
         setError(
@@ -38,11 +43,10 @@ export function DiagnosisForm() {
     fetchSymptoms();
   }, []);
 
-  const toggleSymptom = (symptom: string) => {
-    setSelectedSymptoms((prev) =>
-      prev.includes(symptom)
-        ? prev.filter((s) => s !== symptom)
-        : [...prev, symptom]
+  // We use symptom.id as the value we send to the backend
+  const toggleSymptom = (id: number) => {
+    setSelectedSymptomIds((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
     );
   };
 
@@ -50,7 +54,7 @@ export function DiagnosisForm() {
     e.preventDefault();
     setError("");
 
-    if (selectedSymptoms.length === 0) {
+    if (selectedSymptomIds.length === 0) {
       setError({
         message: "Please select at least one symptom to get a diagnosis.",
       });
@@ -60,7 +64,7 @@ export function DiagnosisForm() {
     setLoading(true);
 
     const request: SymptomInput = {
-      symptoms: selectedSymptoms,
+      symptom_ids: selectedSymptomIds,
     };
 
     try {
@@ -89,8 +93,8 @@ export function DiagnosisForm() {
   };
 
   // Format symptom name for display (replace underscores with spaces and capitalize)
-  const formatSymptomName = (symptom: string): string => {
-    return symptom
+  const formatSymptomName = (value: string): string => {
+    return value
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
@@ -118,9 +122,9 @@ export function DiagnosisForm() {
               />
             </svg>
             Select Symptoms
-            {selectedSymptoms.length > 0 && (
+            {selectedSymptomIds.length > 0 && (
               <span className="ml-3 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                {selectedSymptoms.length} selected
+                {selectedSymptomIds.length} selected
               </span>
             )}
           </label>
@@ -137,9 +141,9 @@ export function DiagnosisForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {availableSymptoms.map((symptom, index) => (
                   <label
-                    key={symptom}
+                    key={symptom.id}
                     className={`flex items-center space-x-3 p-4 rounded-lg cursor-pointer border-2 transition-all hover-lift ${
-                      selectedSymptoms.includes(symptom)
+                      selectedSymptomIds.includes(symptom.id)
                         ? "bg-gradient-to-r from-blue-50 to-purple-50 border-blue-400 shadow-md"
                         : "bg-white border-gray-200 hover:border-blue-300"
                     }`}
@@ -149,39 +153,28 @@ export function DiagnosisForm() {
                   >
                     <input
                       type="checkbox"
-                      checked={selectedSymptoms.includes(symptom)}
-                      onChange={() => toggleSymptom(symptom)}
+                      checked={selectedSymptomIds.includes(symptom.id)}
+                      onChange={() => toggleSymptom(symptom.id)}
                       className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer transition-all"
                     />
                     <span
                       className={`text-sm flex-1 font-medium ${
-                        selectedSymptoms.includes(symptom)
+                        selectedSymptomIds.includes(symptom.id)
                           ? "text-blue-900"
                           : "text-gray-700"
                       }`}
                     >
-                      {formatSymptomName(symptom)}
+                      {symptom.name
+                        ? symptom.name
+                        : formatSymptomName(symptom.code)}
                     </span>
-                    {selectedSymptoms.includes(symptom) && (
-                      <svg
-                        className="w-5 h-5 text-blue-600 animate-bounce-in"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    )}
                   </label>
                 ))}
               </div>
             </div>
           )}
 
-          {selectedSymptoms.length > 0 && (
+          {selectedSymptomIds.length > 0 && (
             <div className="mt-6 animate-slide-up">
               <p className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
                 <svg
@@ -200,16 +193,22 @@ export function DiagnosisForm() {
                 Selected Symptoms:
               </p>
               <div className="flex flex-wrap gap-2">
-                {selectedSymptoms.map((symptom, index) => (
+                {selectedSymptomIds.map((id, index) => {
+                  const symptom = availableSymptoms.find((s) => s.id === id);
+                  const code = symptom?.code ?? "";
+
+                  return (
                   <span
-                    key={symptom}
+                      key={id}
                     className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md hover:shadow-lg transition-all transform hover:scale-105 animate-bounce-in"
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
-                    {formatSymptomName(symptom)}
+                      {symptom?.name
+                        ? symptom.name
+                        : formatSymptomName(code)}
                     <button
                       type="button"
-                      onClick={() => toggleSymptom(symptom)}
+                        onClick={() => toggleSymptom(id)}
                       className="ml-2 hover:bg-white/20 rounded-full p-0.5 transition-colors"
                       aria-label="Remove symptom"
                     >
@@ -226,7 +225,8 @@ export function DiagnosisForm() {
                       </svg>
                     </button>
                   </span>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -235,7 +235,7 @@ export function DiagnosisForm() {
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={loading || loadingSymptoms || selectedSymptoms.length === 0}
+          disabled={loading || loadingSymptoms || selectedSymptomIds.length === 0}
           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
         >
           {loading ? (
